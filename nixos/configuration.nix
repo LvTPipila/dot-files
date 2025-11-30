@@ -1,5 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 { config, lib, pkgs, ... }:
@@ -45,8 +43,12 @@
   };
 
   # Enable sound.
+  security.rtkit.enable = true;
+  services.pulseaudio.enable = false;
   services.pipewire = {
     enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
   };
   
   hardware = {
@@ -74,6 +76,7 @@
     windowManager.i3 = {
       enable = true;
       extraPackages = with pkgs; [
+        btop
         i3status
         i3lock
         i3blocks
@@ -81,8 +84,11 @@
       ];
     };
 
+    displayManager.sessionCommands = ''
+      xwallpaper --zoom ~/Downloads/wallpapers/nixos_light_background.png
+      xset r rate 200 35 &
+    '';
     # No desktop manager
-    displayManager.gdm.enable = false;
     desktopManager.xterm.enable = false;
   };
 
@@ -113,6 +119,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    bat
     vim
     wget
     curl
@@ -123,16 +130,17 @@
     lua
     neofetch
     usbutils
-
     # X11 utils
     xorg.xrandr
     xorg.xset
     xorg.xinit
     xorg.xbacklight
     
+    xwallpaper
     feh
     arandr
   ];
+
 
   # Enable flakes
   nix.settings = {
@@ -143,7 +151,7 @@
   # Garbage collection
   nix.gc = {
     automatic = true;
-    dates = "weekly";
+    dates = "daily";
     options = "--delete-older-than 15d";
   };
 
@@ -156,6 +164,7 @@
   # Fonts
   fonts.packages = with pkgs; [
     dejavu_fonts
+    jetbrains-mono
   ];
   # Enable CUPS to print documents.
   # services.printing.enable = true;
@@ -186,7 +195,7 @@
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
-  system.copySystemConfiguration = true;
+  #system.copySystemConfiguration = true;
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
